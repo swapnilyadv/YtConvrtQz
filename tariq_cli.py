@@ -3,6 +3,7 @@ import re
 import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi
 from dotenv import load_dotenv
+import keyboard  # Requires the 'keyboard' library
 
 # Load environment variables from .env file
 load_dotenv()
@@ -49,30 +50,28 @@ def generate_quiz(transcript, difficulty):
     Difficulty: {difficulty}
     """
     response = get_response_gemini(prompt)
-    return response
+    questions = response.split('\n\n')  # Assuming each question is separated by double newlines
+    return questions
+
+def display_questions(questions):
+    for i, question in enumerate(questions):
+        print(f"Question {i + 1}:\n{question}\n")
+        print("Press 'Space' to see the next question...")
+        keyboard.wait('space')
 
 if __name__ == "__main__":
-    while True:
-        yt_link = input("Enter the Youtube video link: ").strip()
-        if yt_link.lower() == 'exit':
-            break
-        difficulty = input("Enter the difficulty level (easy, medium, hard): ").strip().lower()
+    yt_link = input("Enter the Youtube video link: ").strip()
+    difficulty = input("Enter the difficulty level (easy, medium, hard): ").strip().lower()
 
-        video_id = extract_video_id(yt_link)
-        if not video_id:
-            print("Invalid YouTube URL")
-            continue
-
+    video_id = extract_video_id(yt_link)
+    if not video_id:
+        print("Invalid YouTube URL")
+    else:
         transcript = get_video_transcript(video_id)
         if not transcript:
             print("Could not fetch transcript")
-            continue
-
-        quiz_response = generate_quiz(transcript, difficulty)
-        print(quiz_response.replace("*", ""))
-
-        more_quizzes = input("Do you want to generate more quizzes? (yes/no): ").strip().lower()
-        if more_quizzes == 'no':
-            break
+        else:
+            quiz_questions = generate_quiz(transcript, difficulty)
+            display_questions(quiz_questions[:5])  # Display only the first 5 questions
 
     print("Goodbye!")
