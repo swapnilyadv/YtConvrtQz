@@ -55,9 +55,10 @@ def generate_quiz(transcript, difficulty):
 
 def display_questions(questions):
     for i, question in enumerate(questions):
-        print(f"Question {i + 1}:\n{question}\n")
-        print("Press 'Space' to see the next question...")
-        keyboard.wait('space')
+        print(f"\n\n{question}\n")
+        if i < len(questions) - 1:
+            print("Press 'Space' for the question...")
+            keyboard.wait('space')
 
 if __name__ == "__main__":
     yt_link = input("Enter the Youtube video link: ").strip()
